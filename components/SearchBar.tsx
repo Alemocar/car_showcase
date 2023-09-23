@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 
+import { SearchBarProps } from '@/types'
 import SearchManufacturer from './SearchManufacturer'
 
 const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
-  <button type="submit" className={`-m1-3 z-10 ${otherClasses}`}>
+  <button type="submit" className={`z-10 -ml-3 ${otherClasses}`}>
     <Image
-      src="/magnifying-glass.svg"
-      alt="magifying glass"
+      src={'/magnifying-glass.svg'}
+      alt={'magnifying glass'}
       width={40}
       height={40}
       className="object-contain"
@@ -18,21 +18,18 @@ const SearchButton = ({ otherClasses }: { otherClasses: string }) => (
   </button>
 )
 
-const SearchBar = ({ setManufacturer, setModel }) => {
-  const [searchManufacturer, setSearchManufacturer] = useState('')
+const SearchBar = ({ setManuFacturer, setModel }: SearchBarProps) => {
   const [searchModel, setSearchModel] = useState('')
-
-  const router = useRouter()
+  const [searchManufacturer, setSearchManufacturer] = useState('')
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (searchManufacturer === '' && searchModel === '') {
-      return alert('Please fill in the search bar')
-    }
+    if (searchManufacturer.trim() === '' && searchModel.trim() === '')
+      return alert('Please provide some input')
 
     setModel(searchModel)
-    setManufacturer(searchManufacturer)
+    setManuFacturer(searchManufacturer)
   }
 
   return (
@@ -49,7 +46,7 @@ const SearchBar = ({ setManufacturer, setModel }) => {
           src="/model-icon.png"
           width={25}
           height={25}
-          className="absolute ml-4 h-[20] w-[20]"
+          className="absolute ml-4 h-[20px] w-[20px]"
           alt="car model"
         />
         <input
@@ -57,7 +54,7 @@ const SearchBar = ({ setManufacturer, setModel }) => {
           name="model"
           value={searchModel}
           onChange={(e) => setSearchModel(e.target.value)}
-          placeholder="Tiguan"
+          placeholder="Tiguan..."
           className="searchbar__input"
         />
         <SearchButton otherClasses="sm:hidden" />

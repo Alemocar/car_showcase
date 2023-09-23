@@ -5,36 +5,38 @@ import Image from 'next/image'
 
 import { CarCard, CustomFilter, Hero, SearchBar, ShowMore } from '@/components'
 import { fuels, yearsOfProduction } from '@/constants'
+import { CarState } from '@/types'
 import { fetchCars } from '@/utils'
 
 export default function Home() {
-  const [allCars, setAllCars] = useState([])
+  const [allCars, setAllCars] = useState<CarState>([])
   const [loading, setLoading] = useState(false)
 
-  // Search state
-  const [manufacturer, setManufacturer] = useState('')
+  // search states
+  const [manufacturer, setManuFacturer] = useState('')
   const [model, setModel] = useState('')
 
-  // Filter states
+  // filter state
   const [fuel, setFuel] = useState('')
-  const [year, setYear] = useState(2023)
+  const [year, setYear] = useState(2022)
 
-  // Pagination states
+  // limit state
   const [limit, setLimit] = useState(10)
 
   const getCars = async () => {
     setLoading(true)
     try {
       const result = await fetchCars({
-        manufacturer: manufacturer || '',
+        manufacturer: manufacturer.toLowerCase() || '',
+        model: model.toLowerCase() || '',
+        fuel: fuel.toLowerCase() || '',
         year: year || 2022,
-        fuel: fuel || '',
-        limit: limit || 10,
-        model: model || ''
+        limit: limit || 10
       })
+
       setAllCars(result)
-    } catch (error) {
-      console.log(error)
+    } catch {
+      console.error()
     } finally {
       setLoading(false)
     }
@@ -47,41 +49,41 @@ export default function Home() {
   return (
     <main className="overflow-hidden">
       <Hero />
+
       <div className="padding-x padding-y max-width mt-12" id="discover">
         <div className="home__text-container">
-          <h1 className="text-4xl font-extrabold">Car Cataloge</h1>
-          <p>Explore the car you might like</p>
+          <h1 className="text-4xl font-extrabold">Car Catalogue</h1>
+          <p>Explore out cars you might like</p>
         </div>
+
         <div className="home__filters">
-          <SearchBar setManufacturer={setManufacturer} setModel={setModel} />
+          <SearchBar setManuFacturer={setManuFacturer} setModel={setModel} />
 
           <div className="home__filter-container">
-            <CustomFilter title="fuel" options={fuels} setFilter={setFuel} />
-            <CustomFilter
-              title="year"
-              options={yearsOfProduction}
-              setFilter={setYear}
-            />
+            <CustomFilter options={fuels} setFilter={setFuel} />
+            <CustomFilter options={yearsOfProduction} setFilter={setYear} />
           </div>
         </div>
 
         {allCars.length > 0 ? (
           <section>
             <div className="home__cars-wrapper">
-              {allCars?.map((car) => <CarCard car={car} />)}
+              {allCars?.map((car, index) => (
+                <CarCard key={`car-${index}`} car={car} />
+              ))}
             </div>
 
-            {/* {loading && (
-              <div className="flex-center mt-6 w-full">
+            {loading && (
+              <div className="flex-center mt-16 w-full">
                 <Image
-                  src="/loader.svg"
-                  alt="loading"
+                  src="./loader.svg"
+                  alt="loader"
                   width={50}
                   height={50}
                   className="object-contain"
                 />
               </div>
-            )} */}
+            )}
 
             <ShowMore
               pageNumber={limit / 10}
@@ -90,10 +92,12 @@ export default function Home() {
             />
           </section>
         ) : (
-          <div className="home__error-container">
-            <h2 className="text-xl font-bold text-black">Oops, no results</h2>
-            <p>{allCars?.message}</p>
-          </div>
+          !loading && (
+            <div className="home__error-container">
+              <h2 className="text-xl font-bold text-black">Oops, no results</h2>
+              <p>{allCars?.message}</p>
+            </div>
+          )
         )}
       </div>
     </main>
